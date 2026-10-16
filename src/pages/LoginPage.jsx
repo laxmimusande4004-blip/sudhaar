@@ -14,7 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const location = useLocation();
-  const redirectTo = location.state?.from?.pathname || "/report";
+  const redirectTo = location.state?.from?.pathname || "/";
 
   async function handleSubmit(event) {
     event.preventDefault();

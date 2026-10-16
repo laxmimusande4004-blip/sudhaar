@@ -61,7 +61,7 @@ export default function RegisterPage() {
       });
 
       if (data.session) {
-        navigate("/report", { replace: true });
+        navigate("/", { replace: true });
       } else {
         setMessage(
           "Your account was created. Check your email for a confirmation link before signing in."

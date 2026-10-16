@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   CalendarDays,
@@ -67,6 +67,15 @@ export default function ComplaintDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [voteBusy, setVoteBusy] = useState(false);
+
+  const location = useLocation();
+
+  const backPath = location.state?.from === "/admin" ? "/admin" : "/complaints";
+
+  const backLabel =
+   backPath === "/admin"
+    ? "Back to Admin Dashboard"
+    : "Back to Community Complaints";
 
   const loadComplaint = useCallback(async () => {
     setLoading(true);
@@ -171,12 +180,13 @@ export default function ComplaintDetailPage() {
 
       <main className="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-14">
         <Link
-          to="/complaints"
-          className="inline-flex items-center gap-2 text-sm text-[#58675C] hover:text-[#245B43]"
+            to={backPath}
+            className="inline-flex items-center gap-2 text-sm text-[#58675C] hover:text-[#245B43]"
         >
-          <ArrowLeft size={16} />
-          All complaints
+            <ArrowLeft size={16} />
+            {backLabel}
         </Link>
+
 
         {loading ? (
           <div className="py-20 text-center text-sm text-[#687468]">
@@ -389,11 +399,12 @@ export default function ComplaintDetailPage() {
                   </p>
                 )}
 
+                
                 <Link
-                  to="/complaints"
-                  className="inline-flex items-center gap-2 text-sm font-medium text-[#245B43] hover:underline"
+                    to={backPath}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#245B43] hover:underline"
                 >
-                  <ArrowLeft size={15} /> Back to all complaints
+                    ← {backLabel}
                 </Link>
               </aside>
             </div>

@@ -8,6 +8,8 @@ import ProfilePage from "./pages/ProfilePage";
 import ComplaintsPage from "./pages/ComplaintsPage";
 import ComplaintDetailPage from "./pages/ComplaintDetailPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 
 function NotFoundPage() {
   return (
@@ -40,6 +42,10 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/report" element={<ReportIssuePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminDashboardPage />} />
         </Route>
 
         <Route path="/login" element={<LoginPage />} />
