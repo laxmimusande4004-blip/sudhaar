@@ -75,9 +75,9 @@ export default function Navbar() {
             Explore map
           </a>
 
-          <a href="/#reports" className={linkClass}>
+          <Link to="/complaints" className={linkClass}>
             Community reports
-          </a>
+          </Link>
 
           {user ? (
             <Link to="/profile" className={linkClass}>

@@ -30,12 +30,12 @@ export default function Hero() {
               <ArrowRight size={17} />
             </Link>
 
-            <a
-              href="#reports"
+            <Link
+              to="/complaints"
               className="inline-flex items-center rounded-lg border border-[#D5D9CF] px-5 py-3.5 text-sm font-medium text-[#294536] transition-colors hover:bg-[#EEEEE5]"
             >
               Browse existing reports
-            </a>
+            </Link>
           </div>
         </div>
 

@@ -24,9 +24,6 @@ function MapSection() {
           <IndiaMap />
         </div>
 
-        <p className="mt-3 text-xs leading-5 text-[#7C8578]">
-          Markers currently use illustrative data, not live public reports.
-        </p>
       </div>
     </section>
   );
