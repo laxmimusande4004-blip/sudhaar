@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -10,6 +10,10 @@ import {
   UserRound,
   LogOut,
   LayoutDashboard,
+  ArrowUpRight,
+  MapPinned,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -20,6 +24,7 @@ export default function Navbar() {
 
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const closeMenu = () => setMenuOpen(false);
   const isAdmin = role === "admin";
@@ -61,6 +66,21 @@ export default function Navbar() {
     };
   }, [user]);
 
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") closeMenu();
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [menuOpen]);
+
   const handleSignOut = async () => {
     if (signingOut) return;
 
@@ -78,183 +98,222 @@ export default function Navbar() {
     }
   };
 
-  const linkClass =
-    "text-sm text-[#4F5F52] transition-colors hover:text-[#245B43]";
+  const navLinks = [
+    { to: "/#map", label: "Explore map" },
+    { to: "/complaints", label: "Community reports" },
+  ];
+
+  const navLinkClass = (active = false) =>
+    `relative inline-flex items-center gap-2 rounded-full px-3.5 py-2.5 text-[13px] font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#83AC8A] ${
+      active
+        ? "bg-[#E8F0E5] text-[#245B43]"
+        : "text-[#526455] hover:bg-white/75 hover:text-[#1E5036]"
+    }`;
 
   const mobileLinkClass =
-    "rounded-lg px-3 py-3 text-sm text-[#4F5F52] transition-colors hover:bg-[#EAECE2]";
+    "group flex items-center justify-between rounded-xl px-3.5 py-3 text-sm font-medium text-[#435747] transition-all duration-200 hover:bg-[#EDF2E9] hover:text-[#245B43]";
 
-  const adminDesktopClass =
-    "inline-flex items-center gap-2 rounded-lg border border-[#C9D9C9] bg-[#EAF1E8] px-3.5 py-2.5 text-sm font-semibold text-[#245B43] transition-colors hover:bg-[#DDE9DB]";
+  const primaryActionClass =
+    "group relative inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-full bg-[#245B43] px-4.5 py-2.5 text-[13px] font-semibold text-white shadow-[0_5px_15px_rgba(36,91,67,.16)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#194832] hover:shadow-[0_9px_22px_rgba(36,91,67,.24)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#BBD5B9] active:translate-y-0";
 
-  const adminMobileClass =
-    "mt-1 inline-flex items-center gap-2 rounded-lg border border-[#C9D9C9] bg-[#EAF1E8] px-3 py-3 text-sm font-semibold text-[#245B43] transition-colors hover:bg-[#DDE9DB]";
+  const isExploreActive = location.pathname === "/" && location.hash === "#map";
+  const isReportsActive = location.pathname.startsWith("/complaints");
 
   return (
-    <header className="sticky top-0 z-[1000] border-b border-[#E4E5DC] bg-[#F7F6F0]/95 backdrop-blur-md">
+    <header className="sticky top-0 z-[1000] px-3 pt-3 sm:px-5 sm:pt-4">
       <nav
-        className="mx-auto flex min-h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12"
+        className="relative mx-auto flex min-h-[68px] max-w-[1376px] items-center justify-between gap-3 rounded-2xl border border-white/75 bg-[#F9FAF5]/80 px-4 shadow-[0_8px_32px_rgba(29,57,36,.08),inset_0_1px_0_rgba(255,255,255,.9)] backdrop-blur-2xl backdrop-saturate-150 sm:rounded-[1.35rem] sm:px-6 lg:px-7"
         aria-label="Main navigation"
       >
-        {/* Brand */}
-        <Link
-          to="/"
-          onClick={closeMenu}
-          className="flex items-center gap-3"
-          aria-label="CivicTrack home"
-        >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#245B43] text-white shadow-sm">
-            <ShieldCheck size={21} strokeWidth={1.8} />
-          </span>
+        {/* Soft glass highlight */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent"
+        />
 
-          <span>
-            <span className="block text-lg font-bold tracking-tight text-[#21382B]">
-              CivicTrack
-            </span>
-            <span className="hidden text-[11px] text-[#687468] sm:block">
-              Community issue register
-            </span>
-          </span>
+        {/* Brand */}
+        <Link to="/" onClick={closeMenu} aria-label="Sudhaar home">
+          <img
+            src="/logo.png"
+            alt="Sudhaar"
+            className="h-12 w-auto object-contain"
+          />
         </Link>
 
         {/* Desktop navigation */}
-        <div className="hidden items-center gap-6 md:flex">
-          <Link to="/#map" className={linkClass}>
-            Explore map
-          </Link>
+        <div className="hidden items-center gap-1 rounded-full border border-white/70 bg-white/45 p-1.5 shadow-[inset_0_1px_2px_rgba(40,60,40,.04)] md:flex">
+          {navLinks.map((item) => {
+            const active =
+              (item.to === "/#map" && isExploreActive) ||
+              (item.to === "/complaints" && isReportsActive);
 
-          <Link to="/complaints" className={linkClass}>
-            Community reports
-          </Link>
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={navLinkClass(active)}
+              >
+                {item.label}
+                {active && (
+                  <span className="absolute inset-x-3 -bottom-1 h-0.5 rounded-full bg-[#4F8558]" />
+                )}
+              </Link>
+            );
+          })}
 
           {user ? (
-            <Link to="/profile" className={linkClass}>
+            <Link to="/profile" className={navLinkClass(location.pathname === "/profile")}>
               My profile
             </Link>
           ) : (
-            <>
-              <Link to="/login" className={linkClass}>
-                Sign in
-              </Link>
-              <Link to="/register" className={linkClass}>
-                Create account
-              </Link>
-            </>
+            <Link to="/login" className={navLinkClass(location.pathname === "/login")}>
+              Sign in
+            </Link>
           )}
         </div>
 
         {/* Desktop actions */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden shrink-0 items-center gap-2.5 md:flex">
           {user ? (
             <>
               {isAdmin && (
-                <Link to="/admin" className={adminDesktopClass}>
-                  <LayoutDashboard size={16} />
-                  Admin panel
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#C8DCC7]/90 bg-[#EAF2E7]/80 px-3.5 py-2.5 text-[13px] font-semibold text-[#245B43] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#A8C8A8] hover:bg-[#DFECDC]"
+                >
+                  <LayoutDashboard size={15} />
+                  Admin
                 </Link>
               )}
 
-              <Link
-                to="/report"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#245B43] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#194832]"
-              >
-                <Plus size={17} />
+              <Link to="/report" className={primaryActionClass}>
+                <Plus size={16} strokeWidth={2.5} className="transition-transform duration-200 group-hover:rotate-90" />
                 Report an issue
+                <ArrowUpRight size={14} className="ml-0.5 opacity-65 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
 
               <button
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className="inline-flex items-center gap-2 text-sm text-[#687468] transition-colors hover:text-[#245B43] disabled:opacity-50"
+                aria-label="Sign out"
+                title={signingOut ? "Signing out" : "Sign out"}
+                className="grid h-10 w-10 place-items-center rounded-full text-[#788578] transition-all duration-200 hover:bg-[#F0E8E4] hover:text-[#9A4738] disabled:opacity-50"
               >
-                <LogOut size={16} />
-                {signingOut ? "Signing out…" : "Sign out"}
+                <LogOut size={17} />
               </button>
             </>
           ) : (
-            <Link
-              to="/report"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#245B43] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#194832]"
-            >
-              <Plus size={17} />
-              Report an issue
-            </Link>
+            <>
+              <Link
+                to="/register"
+                className="hidden rounded-full px-3 py-2.5 text-[13px] font-semibold text-[#526455] transition-colors hover:text-[#245B43] lg:inline-flex"
+              >
+                Create account
+              </Link>
+              <Link to="/report" className={primaryActionClass}>
+                <Plus size={16} strokeWidth={2.5} className="transition-transform duration-200 group-hover:rotate-90" />
+                Report an issue
+                <ArrowUpRight size={14} className="ml-0.5 opacity-65 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </>
           )}
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile menu toggle */}
         <button
           type="button"
           onClick={() => setMenuOpen((open) => !open)}
-          className="rounded-lg p-2 text-[#294536] transition-colors hover:bg-[#EAECE2] md:hidden"
+          className="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/80 bg-white/65 text-[#294536] shadow-sm transition-all duration-200 hover:bg-white hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[#83AC8A] md:hidden"
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={menuOpen}
           aria-controls="mobile-navigation"
         >
-          {menuOpen ? <X size={23} /> : <Menu size={23} />}
+          <span className={`absolute transition-all duration-200 ${menuOpen ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"}`}>
+            <Menu size={21} />
+          </span>
+          <span className={`absolute transition-all duration-200 ${menuOpen ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0"}`}>
+            <X size={21} />
+          </span>
         </button>
       </nav>
 
-      {/* Mobile navigation */}
-      {menuOpen && (
-        <div
-          id="mobile-navigation"
-          className="border-t border-[#E4E5DC] bg-[#F7F6F0] px-5 py-4 md:hidden"
-        >
-          <nav className="mx-auto flex max-w-7xl flex-col gap-1" aria-label="Mobile navigation">
-            <Link
-              to="/#map"
-              onClick={closeMenu}
-              className={mobileLinkClass}
-            >
-              Explore map
-            </Link>
+      {/* Animated glass mobile panel */}
+      <div
+        id="mobile-navigation"
+        aria-hidden={!menuOpen}
+        className={`mx-auto grid max-w-[1376px] overflow-hidden transition-[grid-template-rows,opacity,transform,margin] duration-300 ease-out md:hidden ${
+          menuOpen
+            ? "mt-2 grid-rows-[1fr] translate-y-0 opacity-100"
+            : "pointer-events-none mt-0 grid-rows-[0fr] -translate-y-2 opacity-0"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <nav
+            className="rounded-2xl border border-white/80 bg-[#F9FAF5]/90 p-3 shadow-[0_15px_40px_rgba(29,57,36,.12),inset_0_1px_0_rgba(255,255,255,.9)] backdrop-blur-2xl"
+            aria-label="Mobile navigation"
+          >
+            <div className="mb-2 flex items-center justify-between px-3.5 pb-3 pt-1">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#849182]">Navigate</p>
+                <p className="mt-1 text-sm font-semibold text-[#25412E]">Make your city heard.</p>
+              </div>
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#E8F0E5] text-[#245B43]">
+                <MapPinned size={17} />
+              </span>
+            </div>
 
-            <Link
-              to="/complaints"
-              onClick={closeMenu}
-              className={mobileLinkClass}
-            >
-              Community reports
-            </Link>
+            {navLinks.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={closeMenu}
+                tabIndex={menuOpen ? 0 : -1}
+                className={mobileLinkClass}
+              >
+                {item.label}
+                <ChevronRight size={16} className="text-[#9AA697] transition-transform group-hover:translate-x-1 group-hover:text-[#245B43]" />
+              </Link>
+            ))}
 
             {user ? (
               <>
                 <Link
                   to="/profile"
                   onClick={closeMenu}
-                  className={`${mobileLinkClass} flex items-center gap-2`}
+                  tabIndex={menuOpen ? 0 : -1}
+                  className={mobileLinkClass}
                 >
-                  <UserRound size={17} />
-                  My profile
+                  <span className="flex items-center gap-2.5"><UserRound size={17} /> My profile</span>
+                  <ChevronRight size={16} className="text-[#9AA697]" />
                 </Link>
 
                 {isAdmin && (
                   <Link
                     to="/admin"
                     onClick={closeMenu}
-                    className={adminMobileClass}
+                    tabIndex={menuOpen ? 0 : -1}
+                    className="group mt-1 flex items-center justify-between rounded-xl border border-[#C8DCC7] bg-[#EAF2E7]/80 px-3.5 py-3 text-sm font-semibold text-[#245B43] transition hover:bg-[#DFECDC]"
                   >
-                    <LayoutDashboard size={17} />
-                    Go to admin panel
+                    <span className="flex items-center gap-2.5"><LayoutDashboard size={17} /> Admin dashboard</span>
+                    <ArrowUpRight size={15} />
                   </Link>
                 )}
 
                 <Link
                   to="/report"
                   onClick={closeMenu}
-                  className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-[#245B43] px-4 py-3 text-sm font-medium text-white hover:bg-[#194832]"
+                  tabIndex={menuOpen ? 0 : -1}
+                  className={`${primaryActionClass} mt-3 w-full`}
                 >
-                  <Plus size={17} />
-                  Report an issue
+                  <Plus size={17} /> Report an issue <ArrowUpRight size={14} />
                 </Link>
 
                 <button
                   type="button"
                   onClick={handleSignOut}
                   disabled={signingOut}
-                  className={`${mobileLinkClass} mt-1 flex items-center gap-2 text-left disabled:opacity-50`}
+                  className="mt-2 flex w-full items-center gap-2.5 rounded-xl px-3.5 py-3 text-left text-sm font-medium text-[#8A5A52] transition hover:bg-[#F5EAE6] disabled:opacity-50"
                 >
                   <LogOut size={17} />
                   {signingOut ? "Signing out…" : "Sign out"}
@@ -265,32 +324,39 @@ export default function Navbar() {
                 <Link
                   to="/login"
                   onClick={closeMenu}
+                  tabIndex={menuOpen ? 0 : -1}
                   className={mobileLinkClass}
                 >
                   Sign in
+                  <ChevronRight size={16} className="text-[#9AA697]" />
                 </Link>
-
                 <Link
                   to="/register"
                   onClick={closeMenu}
+                  tabIndex={menuOpen ? 0 : -1}
                   className={mobileLinkClass}
                 >
                   Create account
+                  <ChevronRight size={16} className="text-[#9AA697]" />
                 </Link>
-
                 <Link
                   to="/report"
                   onClick={closeMenu}
-                  className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-[#245B43] px-4 py-3 text-sm font-medium text-white hover:bg-[#194832]"
+                  tabIndex={menuOpen ? 0 : -1}
+                  className={`${primaryActionClass} mt-3 w-full`}
                 >
-                  <Plus size={17} />
-                  Report an issue
+                  <Plus size={17} /> Report an issue <ArrowUpRight size={14} />
                 </Link>
               </>
             )}
+
+            <div className="mt-3 flex items-center justify-center gap-2 border-t border-[#E4E9E0] pt-3 text-[10px] font-medium text-[#8A9587]">
+              <Sparkles size={12} className="text-[#6F966E]" />
+              Community-powered civic progress
+            </div>
           </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 }
