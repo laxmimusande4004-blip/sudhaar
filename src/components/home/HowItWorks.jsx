@@ -35,7 +35,7 @@ export default function HowItWorks() {
             <SectionHeading
               eyebrow="A simple public record"
               title="From “something's wrong” to “here's what happened.”"
-              description="CivicTrack gives residents a shared place to raise local issues and follow the record as it develops."
+              description="Sudhaar gives residents a shared place to raise local issues and follow the record as it develops."
             />
             <Link to="/report" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-[#245B43] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#194832]">
               Start a report <ArrowUpRight size={16} />
